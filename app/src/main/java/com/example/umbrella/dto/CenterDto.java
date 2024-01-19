@@ -2,6 +2,8 @@ package com.example.umbrella.dto;
 
 public class CenterDto {
 
+    //aaa
+
     String centercode;
     String centerAddr;
     String regId;
