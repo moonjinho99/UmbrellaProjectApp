@@ -3,7 +3,6 @@ package com.example.umbrella.dto;
 import java.util.Date;
 
 public class UmbrellaDTO {
-
     int umbrellacode;
     int price;
     String rentalId;
