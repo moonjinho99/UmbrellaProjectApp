@@ -7,7 +7,9 @@ public class RetrofitClient {
     private static RetrofitClient instance = null;
     private static RetrofitInterface retrofitInterface;
 
-    private static String baseUrl = "http://192.168.0.41:8000";
+//    private static String baseUrl = "http://192.168.0.41:8000";
+
+    private static String baseUrl = "http://192.168.0.91:8000";
 
     private RetrofitClient(){
         retrofit2.Retrofit retrofit = new Retrofit.Builder()
