@@ -76,7 +76,8 @@ public class JoinActivity extends AppCompatActivity {
         idCheckBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MemberDto memberDto = new MemberDto(id.getText().toString());
+                MemberDto memberDto = new MemberDto();
+                memberDto.setId(id.getText().toString());
                 Gson gson = new Gson();
                 String userInfo = gson.toJson(memberDto);
 
@@ -155,7 +156,11 @@ public class JoinActivity extends AppCompatActivity {
 
                 verifyCode();
 
-                MemberDto memberDto = new MemberDto(id.getText().toString(), username.getText().toString(), pwd.getText().toString(), phone.getText().toString());
+                MemberDto memberDto = new MemberDto();
+                memberDto.setId(id.getText().toString());
+                memberDto.setName(username.getText().toString());
+                memberDto.setPw(pwd.getText().toString());
+                memberDto.setPhone(phone.getText().toString());
                 Gson gson = new Gson();
                 String userInfo = gson.toJson(memberDto);
 

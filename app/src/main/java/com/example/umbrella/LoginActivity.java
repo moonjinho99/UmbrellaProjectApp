@@ -46,7 +46,9 @@ public class LoginActivity extends AppCompatActivity {
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MemberDto memberDto = new MemberDto(id.getText().toString(), 0, pwd.getText().toString(), 0);
+                MemberDto memberDto = new MemberDto();
+                memberDto.setId(id.getText().toString());
+                memberDto.setPw(pwd.getText().toString());
                 Gson gson = new Gson();
                 String userInfo = gson.toJson(memberDto);
 
@@ -57,9 +59,7 @@ public class LoginActivity extends AppCompatActivity {
                 call.clone().enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                        Log.e("연결 ","성공");
                         if (response.isSuccessful()) {
-                            Toast.makeText(getApplicationContext(), "성공", Toast.LENGTH_SHORT).show();
                             try {
                                 if (response.body().string().equals("success")) {
                                     Toast.makeText(getApplicationContext(), "로그인 성공", Toast.LENGTH_SHORT).show();

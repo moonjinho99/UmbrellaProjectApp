@@ -9,28 +9,6 @@ public class MemberDto {
     int rentalUmbCnt;
     int level;
 
-    // 로그인
-
-    public MemberDto(String id, int level, String pw, int rentalUmbCnt) {
-        this.id = id;
-        this.level = level;
-        this.pw = pw;
-        this.rentalUmbCnt = rentalUmbCnt;
-    }
-
-    // 아이디 중복확인
-    public MemberDto(String id) {
-        this.id = id;
-    }
-
-    // 회원가입
-    public MemberDto(String id, String name, String pw, String phone) {
-        this.id = id;
-        this.name = name;
-        this.pw = pw;
-        this.phone = phone;
-    }
-
     public String getId() {
         return id;
     }
