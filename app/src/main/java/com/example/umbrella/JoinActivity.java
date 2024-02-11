@@ -135,7 +135,7 @@ public class JoinActivity extends AppCompatActivity {
                     new String[]{Manifest.permission.SEND_SMS}, PERMISSION_REQUEST_CODE);
         }
 
-        // 회원가입
+        // 가입 버튼 클릭시
         joinBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
