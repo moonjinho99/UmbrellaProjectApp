@@ -183,7 +183,7 @@ public class JoinActivity extends AppCompatActivity {
                                             try {
                                                 if (response.body().string().equals("success")) {
                                                     Toast.makeText(getApplicationContext(), "회원가입 완료", Toast.LENGTH_SHORT).show();
-                                                    Intent intent = new Intent(JoinActivity.this, MainActivity.class);
+                                                    Intent intent = new Intent(JoinActivity.this, LoginActivity.class);
                                                     startActivity(intent);
                                                 } else {
                                                     Toast.makeText(getApplicationContext(), "회원가입 실패", Toast.LENGTH_SHORT).show();
