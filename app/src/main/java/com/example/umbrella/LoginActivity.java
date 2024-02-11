@@ -59,6 +59,7 @@ public class LoginActivity extends AppCompatActivity {
                 call.clone().enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        Log.e("연결 ","성공");
                         if (response.isSuccessful()) {
                             try {
                                 if (response.body().string().equals("success")) {
@@ -77,6 +78,7 @@ public class LoginActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        Log.e("연결 ",t.getMessage());
                         Toast.makeText(getApplicationContext(), "로그인 실패", Toast.LENGTH_SHORT).show();
                     }
                 });

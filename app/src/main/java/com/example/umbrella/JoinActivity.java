@@ -135,7 +135,7 @@ public class JoinActivity extends AppCompatActivity {
                     new String[]{Manifest.permission.SEND_SMS}, PERMISSION_REQUEST_CODE);
         }
 
-        // 가입 버튼 클릭시
+        // 회원가입
         joinBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -183,7 +183,7 @@ public class JoinActivity extends AppCompatActivity {
                                             try {
                                                 if (response.body().string().equals("success")) {
                                                     Toast.makeText(getApplicationContext(), "회원가입 완료", Toast.LENGTH_SHORT).show();
-                                                    Intent intent = new Intent(JoinActivity.this, LoginActivity.class);
+                                                    Intent intent = new Intent(JoinActivity.this, MainActivity.class);
                                                     startActivity(intent);
                                                 } else {
                                                     Toast.makeText(getApplicationContext(), "회원가입 실패", Toast.LENGTH_SHORT).show();
@@ -210,7 +210,7 @@ public class JoinActivity extends AppCompatActivity {
         cancelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(JoinActivity.this, LoginActivity.class);
+                Intent intent = new Intent(JoinActivity.this, MainActivity.class);
                 startActivity(intent);
             }
         });
@@ -245,7 +245,9 @@ public class JoinActivity extends AppCompatActivity {
     // 6자리 인증 코드 생성
     private String generateVerificationCode() {
         Random random = new Random();
-        return String.format("%06d", random.nextInt(1000000));
+        String auth_num = String.format("%06d", random.nextInt(1000000));
+        Log.e("생성된 인증코드 확인",auth_num);
+        return auth_num;
     }
 
     // 생성된 인증 코드와 입력한 인증 코드를 비교

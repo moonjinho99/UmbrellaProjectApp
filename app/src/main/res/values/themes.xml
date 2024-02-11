@@ -1,9 +1,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.Umbrella" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+  <!--  <style name="Base.Theme.Umbrella" parent="Theme.Material3.DayNight.NoActionBar">
+        &lt;!&ndash; Customize your light theme here. &ndash;&gt;
+        &lt;!&ndash; <item name="colorPrimary">@color/my_light_primary</item> &ndash;&gt;
+    </style>-->
+
+    <!-- 아래를 추가해야 popup dialog 시 특정 기종에서 에러가 발생하지 않는다 -->
+    <style name="Base.Theme.Umbrella." parent="Theme.AppCompat.Light.NoActionBar">
     </style>
 
-    <style name="Theme.Umbrella" parent="Base.Theme.Umbrella" />
 </resources>
