@@ -45,7 +45,7 @@ public class JoinActivity extends AppCompatActivity {
 
     private static final String TAG = "JoinActivity";
     private static final int PERMISSION_REQUEST_CODE = 1;
-    private static final String DESTINATION_PHONE_NUMBER = "070-1004-1004";
+    private static final String SENDER_PHONE_NUMBER = "07010041004";
     private String verificationCode;
 
     @Override
@@ -176,22 +176,18 @@ public class JoinActivity extends AppCompatActivity {
                                 phone.getText().toString().isEmpty() || certNum.getText().toString().isEmpty()) {
                             Toast.makeText(getApplicationContext(), "빈칸 없이 입력해 주세요.", Toast.LENGTH_SHORT).show();
                         } else {
-                            if (idType == 1) {  // 아이디 중복 체크
-                                if (pwdType == 1) { // 비밀번호 확인 체크
-                                    if (certNumType == 1) { // 인증코드 확인 체크
-                                        if (response.isSuccessful()) {
-                                            try {
-                                                if (response.body().string().equals("success")) {
-                                                    Toast.makeText(getApplicationContext(), "회원가입 완료", Toast.LENGTH_SHORT).show();
-                                                    Intent intent = new Intent(JoinActivity.this, MainActivity.class);
-                                                    startActivity(intent);
-                                                } else {
-                                                    Toast.makeText(getApplicationContext(), "회원가입 실패", Toast.LENGTH_SHORT).show();
-                                                }
-                                            } catch (IOException e) {
-                                                throw new RuntimeException(e);
-                                            }
+                            if (idType == 1 && pwdType == 1 && certNumType == 1) {  // 아이디 중복, 비밀번호 확인, 인증코드 확인 체크
+                                if (response.isSuccessful()) {
+                                    try {
+                                        if (response.body().string().equals("success")) {
+                                            Toast.makeText(getApplicationContext(), "회원가입 완료", Toast.LENGTH_SHORT).show();
+                                            Intent intent = new Intent(JoinActivity.this, LoginActivity.class);
+                                            startActivity(intent);
+                                        } else {
+                                            Toast.makeText(getApplicationContext(), "회원가입 실패", Toast.LENGTH_SHORT).show();
                                         }
+                                    } catch (IOException e) {
+                                        throw new RuntimeException(e);
                                     }
                                 }
                             }
@@ -210,7 +206,7 @@ public class JoinActivity extends AppCompatActivity {
         cancelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(JoinActivity.this, MainActivity.class);
+                Intent intent = new Intent(JoinActivity.this, LoginActivity.class);
                 startActivity(intent);
             }
         });
@@ -233,7 +229,7 @@ public class JoinActivity extends AppCompatActivity {
         } else {
             try {
                 SmsManager smsManager = SmsManager.getDefault();
-                smsManager.sendTextMessage(phoneNumber, null, message, null, null);
+                smsManager.sendTextMessage(phoneNumber, SENDER_PHONE_NUMBER, message, null, null);
                 Toast.makeText(this, "인증 코드를 전송했습니다.", Toast.LENGTH_SHORT).show();
             } catch (Exception e) {
                 Log.e(TAG, "SMS 전송 중 오류 발생: " + e.getMessage());
@@ -246,7 +242,7 @@ public class JoinActivity extends AppCompatActivity {
     private String generateVerificationCode() {
         Random random = new Random();
         String auth_num = String.format("%06d", random.nextInt(1000000));
-        Log.e("생성된 인증코드 확인",auth_num);
+        Log.e("생성된 인증코드 확인", auth_num);
         return auth_num;
     }
 

@@ -55,5 +55,13 @@
             android:layout_gravity="center"
             android:text="대여하기"
             android:textSize="30dp"></Button>
+
+        <Button
+            android:id="@+id/scanQRcode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="QR스캔"
+            android:textSize="30dp"></Button>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

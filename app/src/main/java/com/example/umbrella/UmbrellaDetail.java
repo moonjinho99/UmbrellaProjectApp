@@ -1,14 +1,23 @@
 package com.example.umbrella;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 
 import kr.co.bootpay.Bootpay;
 import kr.co.bootpay.BootpayAnalytics;
@@ -26,11 +35,12 @@ import kr.co.bootpay.model.BootUser;
 
 public class UmbrellaDetail extends AppCompatActivity {
 
+    private static final int CAMERA_PERMISSION_REQUEST_CODE = 1;
     private int stuck = 10;
 
     TextView locknum_detail;
 
-    Button rentalButton;
+    Button rentalButton, scanQRButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +50,7 @@ public class UmbrellaDetail extends AppCompatActivity {
         locknum_detail = (TextView) findViewById(R.id.locknum_detail);
 
         rentalButton = (Button) findViewById(R.id.rentalBtn_detail);
+        scanQRButton = (Button) findViewById(R.id.scanQRcode);
 
         Intent intent = getIntent();
         locknum_detail.setText(intent.getStringExtra("locknum"));
@@ -51,12 +62,26 @@ public class UmbrellaDetail extends AppCompatActivity {
                 onClick_request(view);
             }
         });
+
+        // 카메라 권한 요청
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
+                    CAMERA_PERMISSION_REQUEST_CODE);
+        }
+
+        scanQRButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startScanning();
+            }
+        });
     }
 
     public void onClick_request(View v) {
         // 결제호출
         BootUser bootUser = new BootUser().setPhone("010-1234-5678");
-        BootExtra bootExtra = new BootExtra().setQuotas(new int[] {0,2,3});
+        BootExtra bootExtra = new BootExtra().setQuotas(new int[]{0, 2, 3});
 
         Bootpay.init(getFragmentManager())
                 .setApplicationId("65c84e9000c78a001d3462aa") // 해당 프로젝트(안드로이드)의 application id 값
@@ -85,7 +110,7 @@ public class UmbrellaDetail extends AppCompatActivity {
                     public void onDone(@Nullable String message) {
 
                         Log.d("done", message);
-                        Intent intent = new Intent(UmbrellaDetail.this,RentalfinishActivity.class);
+                        Intent intent = new Intent(UmbrellaDetail.this, RentalfinishActivity.class);
                         startActivity(intent);
 
                     }
@@ -119,4 +144,44 @@ public class UmbrellaDetail extends AppCompatActivity {
                 .request();
     }
 
+    // 카메라 권한 체크
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "카메라 권한 확인.", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "카메라 권한이 필요합니다.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    // 카메라 스캔 시작 메소드
+    private void startScanning() {
+        IntentIntegrator integrator = new IntentIntegrator(this);
+        integrator.setOrientationLocked(false); // 세로 방향으로 QR 코드를 스캔합니다.
+        integrator.setBeepEnabled(false);
+        integrator.initiateScan();
+    }
+
+    // 스캔 시 작동 메소드
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        if (result != null) {
+            if (result.getContents() == null) {
+                Toast.makeText(this, "취소되었습니다.", Toast.LENGTH_SHORT).show();
+            } else {
+                String scannedData = result.getContents();
+                // 스캔된 데이터를 사용합니다.
+                Toast.makeText(this, "스캔 결과: " + scannedData, Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
 }
