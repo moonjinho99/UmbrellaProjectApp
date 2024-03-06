@@ -1,47 +1,37 @@
 package com.example.umbrella;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+
 import com.example.umbrella.dto.LockerDto;
-import com.example.umbrella.dto.MemberDto;
 import com.example.umbrella.dto.UmbrellaDTO;
 import com.example.umbrella.service.RetrofitClient;
 import com.example.umbrella.service.RetrofitInterface;
-import com.google.gson.Gson;
 
-import net.daum.android.map.MapActivity;
 import net.daum.mf.map.api.MapPOIItem;
 import net.daum.mf.map.api.MapPoint;
 import net.daum.mf.map.api.MapView;
 
 import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
 
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -62,6 +52,8 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
     private LinearLayout mypage_layout, map_layout;
     double latitude,longitude;
 
+    TextView id, name;
+
     Call<List<LockerDto>> callLocker;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +64,9 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
         mapBtn = (ImageButton)findViewById(R.id.mapBtn);
         map_layout = (LinearLayout) findViewById(R.id.map_view);
         mypage_layout = (LinearLayout) findViewById(R.id.mypage);
+
+        id = findViewById(R.id.memberid);
+        name = findViewById(R.id.membername);
 
         retrofitClient = RetrofitClient.getInstance();
         retrofitInterface = RetrofitClient.getRetrofitInterface();
@@ -104,6 +99,14 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
             public void onClick(View view) {
                 map_layout.setVisibility(View.INVISIBLE);
                 mypage_layout.setVisibility(View.VISIBLE);
+
+                Intent intent = getIntent();
+
+                String userId = intent.getStringExtra("id");
+                String userName = intent.getStringExtra("name");
+
+                id.setText(userId);
+                name.setText(userName);
             }
         });
 

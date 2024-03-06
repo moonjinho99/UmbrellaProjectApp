@@ -22,6 +22,8 @@ import com.google.gson.Gson;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -29,11 +31,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
-
+    private List<MemberDto> loginInfo;
     EditText id, pwd;
     Button loginBtn, joinBtn;
-    RetrofitInterface userRetrofitInterface;
-    Call<MemberDto> call;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,18 +60,45 @@ public class LoginActivity extends AppCompatActivity {
 
                 Log.e("JSON", userInfo);
 
-                Call<ResponseBody> call = userRetrofitInterface.loginUser(memberDto);
+                Call<ResponseBody> loginCall = userRetrofitInterface.loginUser(memberDto);
+                Call<List<MemberDto>> userInfoCall = userRetrofitInterface.getUserInfo(memberDto);
+                loginInfo = new ArrayList<>();
 
-                call.clone().enqueue(new Callback<ResponseBody>() {
+                loginCall.clone().enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                         Log.e("연결 ","성공");
                         if (response.isSuccessful()) {
                             try {
                                 if (response.body().string().equals("success")) {
-                                    Toast.makeText(getApplicationContext(), "로그인 성공", Toast.LENGTH_SHORT).show();
-                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                    startActivity(intent);
+                                    // 서버로부터 로그인 정보 가져오기
+                                    userInfoCall.clone().enqueue(new Callback<List<MemberDto>>() {
+                                        @Override
+                                        public void onResponse(Call<List<MemberDto>> call, Response<List<MemberDto>> response) {
+                                            Log.e("연결 ","성공");
+                                            if (response.isSuccessful()) {
+                                                loginInfo = response.body();
+
+                                                Log.e("받아온 값 ", loginInfo.toString());
+
+                                                if (loginInfo != null) {
+                                                    Toast.makeText(getApplicationContext(), "로그인 성공", Toast.LENGTH_SHORT).show();
+                                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                                    intent.putExtra("id", loginInfo.get(0).getId());
+                                                    intent.putExtra("name", loginInfo.get(0).getName());
+                                                    startActivity(intent);
+                                                } else {
+                                                    Toast.makeText(getApplicationContext(), "아이디/비밀번호를 확인해주세요", Toast.LENGTH_SHORT).show();
+                                                }
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onFailure(Call<List<MemberDto>> call, Throwable t) {
+                                            Log.e("연결 ",t.getMessage());
+                                            Toast.makeText(getApplicationContext(), "서버 연결 실패", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
                                 } else {
                                     Toast.makeText(getApplicationContext(), "아이디/비밀번호를 확인해주세요", Toast.LENGTH_SHORT).show();
                                 }
@@ -88,6 +115,36 @@ public class LoginActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), "로그인 실패", Toast.LENGTH_SHORT).show();
                     }
                 });
+
+
+
+//                calls.clone().enqueue(new Callback<List<MemberDto>>() {
+//                    @Override
+//                    public void onResponse(Call<List<MemberDto>> call, Response<List<MemberDto>> response) {
+//                        Log.e("연결 ","성공");
+//                        if (response.isSuccessful()) {
+//                            loginInfo = response.body();
+//
+//                            Log.e("받아온 값 ", loginInfo.toString());
+//
+//                            if (loginInfo != null) {
+//                                Toast.makeText(getApplicationContext(), "로그인 성공", Toast.LENGTH_SHORT).show();
+//                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+//                                intent.putExtra("id", loginInfo.get(0).getId());
+//                                intent.putExtra("name", loginInfo.get(0).getName());
+//                                startActivity(intent);
+//                            } else {
+//                                Toast.makeText(getApplicationContext(), "아이디/비밀번호를 확인해주세요", Toast.LENGTH_SHORT).show();
+//                            }
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onFailure(Call<List<MemberDto>> call, Throwable t) {
+//                        Log.e("연결 ",t.getMessage());
+//                        Toast.makeText(getApplicationContext(), "로그인 실패", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
             }
         });
 

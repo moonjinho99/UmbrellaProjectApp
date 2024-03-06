@@ -8,7 +8,6 @@ import java.util.List;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
-import retrofit2.Response;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
@@ -20,6 +19,10 @@ public interface RetrofitInterface {
     // 로그인
     @POST("login-user")
     Call<ResponseBody> loginUser(@Body MemberDto jsonUser);
+
+    // 로그인 세션
+    @POST("login-userInfo")
+    Call<List<MemberDto>> getUserInfo(@Body MemberDto jsonUser);
 
     // 아이디 중복 확인
     @POST("id-check")
