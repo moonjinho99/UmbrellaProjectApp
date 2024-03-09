@@ -37,8 +37,9 @@
 
         <meta-data
             android:name="com.kakao.sdk.AppKey"
-            android:value="cd47301ae9f336d215772c61e24bfa5c" />
-<!--            android:value="f51daad1a23e5ab78886c63a033e1765" />-->
+            android:value="f51daad1a23e5ab78886c63a033e1765" />
+           <!-- android:value="cd47301ae9f336d215772c61e24bfa5c" />-->
+
 
 
         <activity

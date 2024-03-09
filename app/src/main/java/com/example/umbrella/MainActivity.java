@@ -2,14 +2,20 @@ package com.example.umbrella;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.GridLayout;
+import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -29,8 +35,12 @@ import net.daum.mf.map.api.MapPoint;
 import net.daum.mf.map.api.MapView;
 
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -41,8 +51,12 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
     private MapView mapView;
     private ViewGroup mapViewContainer;
 
+    private RentalGridListAdapter adapter = new RentalGridListAdapter();
+
     private List<LockerDto> lockerList;
     static List<UmbrellaDTO> umbrellaList;
+
+    private List<UmbrellaDTO> rentalUmbList;
     private MapPOIItem marker;
     private RetrofitInterface retrofitInterface;
     private RetrofitClient retrofitClient;
@@ -50,11 +64,20 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
     private ImageButton mypageBtn, mapBtn;
 
     private LinearLayout mypage_layout, map_layout;
+
+    private LinearLayout rentalLayout,updateInfoLayout;
+    private GridView rentalGrid;
+
+    private Button rentalBtn,updateInfo;
+
+
     double latitude,longitude;
 
     TextView id, name;
 
     Call<List<LockerDto>> callLocker;
+
+    Call<List<UmbrellaDTO>> callRentalUmb;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,9 +91,33 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
         id = findViewById(R.id.memberid);
         name = findViewById(R.id.membername);
 
+        rentalGrid = findViewById(R.id.rental_umbrellaGridView);
+        rentalLayout = findViewById(R.id.rentalUmbLayout);
+        rentalBtn = findViewById(R.id.rentalMyUmbBtn);
+
+        updateInfoLayout = findViewById(R.id.updateInfoLayout);
+        updateInfo = findViewById(R.id.updateInfoBtn);
+
         retrofitClient = RetrofitClient.getInstance();
         retrofitInterface = RetrofitClient.getRetrofitInterface();
 
+        Intent intent = getIntent();
+
+        String userId = intent.getStringExtra("id");
+        String userName = intent.getStringExtra("name");
+
+        try {
+            PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_SIGNATURES);
+            for (Signature signature : info.signatures) {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                Log.d("키해시는 :", Base64.encodeToString(md.digest(), Base64.DEFAULT));
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
 
         // 권한ID를 가져옵니다
         int permission = ContextCompat.checkSelfPermission(this,
@@ -99,11 +146,7 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
             public void onClick(View view) {
                 map_layout.setVisibility(View.INVISIBLE);
                 mypage_layout.setVisibility(View.VISIBLE);
-
-                Intent intent = getIntent();
-
-                String userId = intent.getStringExtra("id");
-                String userName = intent.getStringExtra("name");
+                rentalLayout.setVisibility(View.VISIBLE);
 
                 id.setText(userId);
                 name.setText(userName);
@@ -118,6 +161,22 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
             }
         });
 
+        rentalBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                rentalLayout.setVisibility(View.VISIBLE);
+                updateInfoLayout.setVisibility(View.INVISIBLE);
+            }
+        });
+
+        updateInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                rentalLayout.setVisibility(View.INVISIBLE);
+                updateInfoLayout.setVisibility(View.VISIBLE);
+            }
+        });
+        
         lockerList = new ArrayList<>();
         //지도에 보관함 표시
         callLocker = retrofitInterface.getLockerList();
@@ -163,6 +222,34 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
         });
 
         mapView.setPOIItemEventListener(this);
+
+        Map<String,Object> myInfo = new HashMap<>();
+        myInfo.put("rentalId",userId);
+        myInfo.put("rentalStatus",1);
+
+        callRentalUmb = retrofitInterface.getMyRentalUmbrella(myInfo);
+
+
+        callRentalUmb.clone().enqueue(new Callback<List<UmbrellaDTO>>() {
+            @Override
+            public void onResponse(Call<List<UmbrellaDTO>> call, Response<List<UmbrellaDTO>> response) {
+                rentalUmbList = response.body();
+
+                RentalGridListAdapter rentalGridListAdapter = new RentalGridListAdapter();
+
+                for (int i=0; i<rentalUmbList.size(); i++)
+                {
+                    rentalGridListAdapter.addItem(rentalUmbList.get(i));
+                }
+
+                rentalGrid.setAdapter(rentalGridListAdapter);
+            }
+
+            @Override
+            public void onFailure(Call<List<UmbrellaDTO>> call, Throwable t) {
+
+            }
+        });
 
     }
     // 권한 체크 이후로직

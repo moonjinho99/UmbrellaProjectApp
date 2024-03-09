@@ -31,6 +31,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
+
+    public static String loginId = "";
     private List<MemberDto> loginInfo;
     EditText id, pwd;
     Button loginBtn, joinBtn;
@@ -82,6 +84,7 @@ public class LoginActivity extends AppCompatActivity {
                                                 Log.e("받아온 값 ", loginInfo.toString());
 
                                                 if (loginInfo != null) {
+                                                    loginId = id.getText().toString();
                                                     Toast.makeText(getApplicationContext(), "로그인 성공", Toast.LENGTH_SHORT).show();
                                                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                                     intent.putExtra("id", loginInfo.get(0).getId());

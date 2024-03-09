@@ -8,13 +8,13 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.example.umbrella.dto.LockerDto;
 import com.example.umbrella.dto.UmbrellaDTO;
 
 import java.util.ArrayList;
 
-public class GridListAdapter extends BaseAdapter {
+public class RentalGridListAdapter extends BaseAdapter {
     ArrayList<UmbrellaDTO> items = new ArrayList<UmbrellaDTO>();
     Context context;
 
@@ -45,29 +45,20 @@ public class GridListAdapter extends BaseAdapter {
         if (convertView == null)
         {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.grid_item,parent,false);
+            convertView = inflater.inflate(R.layout.rental_grid_item,parent,false);
         }
 
         TextView name = convertView.findViewById(R.id.locknum);
         TextView price = convertView.findViewById(R.id.price);
-        Button rentalBtn = convertView.findViewById(R.id.rentalBtn);
-
-        if(listitem.getRentalStatus() == 1)
-        {
-            rentalBtn.setEnabled(false);
-            rentalBtn.setText("대여중");
-        }
+        Button returnBtn = convertView.findViewById(R.id.returnBtn);
 
         name.setText(Integer.toString(listitem.getUmbrellacode()));
         price.setText(Integer.toString(listitem.getPrice()));
 
-        rentalBtn.setOnClickListener(new View.OnClickListener() {
+        returnBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(context, UmbrellaDetail.class);
-                intent.putExtra("locknum",name.getText().toString());
-                intent.putExtra("umbrella_code",listitem.getUmbrellacode());
-                context.startActivity(intent);
+                Toast.makeText(context,"반납하기",Toast.LENGTH_SHORT).show();
             }
         });
 

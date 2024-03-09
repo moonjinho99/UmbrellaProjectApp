@@ -57,6 +57,11 @@ dependencies {
 
     implementation ("com.google.zxing:core:3.4.1")
     implementation ("com.journeyapps:zxing-android-embedded:4.0.0")
+    implementation(files("libs\\libDaumMapAndroid.jar"))
+    implementation(files("libs\\libDaumMapAndroid.jar"))
+    implementation(files("libs\\libDaumMapAndroid.jar"))
+    implementation(files("libs\\libDaumMapAndroid.jar"))
+    implementation(files("libs\\libDaumMapAndroid.jar"))
 
 
     testImplementation("junit:junit:4.13.2")

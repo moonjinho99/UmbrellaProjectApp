@@ -5,6 +5,7 @@ import com.example.umbrella.dto.MemberDto;
 import com.example.umbrella.dto.UmbrellaDTO;
 
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -39,4 +40,11 @@ public interface RetrofitInterface {
     //클릭한 보관함의 우산리스트 확인
     @POST("get_umbrella")
     Call<List<UmbrellaDTO>> getUmbrellaList(@Body String lockercode);
+
+    //우산 대여하기
+    @POST("rental_umbrella")
+    Call<ResponseBody> rentalUmbrella(@Body Map<String,Object> rentalUmbMap);
+
+    @POST("my_rental_umbrella")
+    Call<List<UmbrellaDTO>> getMyRentalUmbrella(@Body Map<String,Object> rentalUmbInfo);
 }

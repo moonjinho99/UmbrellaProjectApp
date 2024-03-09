@@ -3,6 +3,7 @@ package com.example.umbrella;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -16,8 +17,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.example.umbrella.service.RetrofitClient;
+import com.example.umbrella.service.RetrofitInterface;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 
 import kr.co.bootpay.Bootpay;
 import kr.co.bootpay.BootpayAnalytics;
@@ -32,8 +40,15 @@ import kr.co.bootpay.listener.ErrorListener;
 import kr.co.bootpay.listener.ReadyListener;
 import kr.co.bootpay.model.BootExtra;
 import kr.co.bootpay.model.BootUser;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class UmbrellaDetail extends AppCompatActivity {
+
+    private RetrofitInterface retrofitInterface;
+    private RetrofitClient retrofitClient;
 
     private static final int CAMERA_PERMISSION_REQUEST_CODE = 1;
     private int stuck = 10;
@@ -41,6 +56,11 @@ public class UmbrellaDetail extends AppCompatActivity {
     TextView locknum_detail;
 
     Button rentalButton, scanQRButton;
+
+    int umbrella_code=0;
+
+    Map<String,Object> rentalUmbMap = new HashMap<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +74,39 @@ public class UmbrellaDetail extends AppCompatActivity {
 
         Intent intent = getIntent();
         locknum_detail.setText(intent.getStringExtra("locknum"));
+
+        umbrella_code = intent.getIntExtra("umbrella_code",0);
+
+        //대여한 우산의 상태와 대여 계정 변경을 위한 초기화
+        rentalUmbMap.put("umbrella_code", umbrella_code);
+        rentalUmbMap.put("rentalId", LoginActivity.loginId);
+        rentalUmbMap.put("rentalStatus", 1);
+
+        // 현재 날짜
+        LocalDate currentDate = null;
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            currentDate = LocalDate.now();
+
+
+        // 현재 날짜를 기준으로 이틀 후의 날짜
+        LocalDate twoDaysLaterDate = currentDate.plusDays(2);
+
+        // 날짜 형식 지정
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        // 현재 날짜와 이틀 후의 날짜를 문자열로 변환
+        String currentDateString = currentDate.format(formatter);
+        String twoDaysLaterDateString = twoDaysLaterDate.format(formatter);
+
+        rentalUmbMap.put("rentalTime",currentDateString);
+        rentalUmbMap.put("returnTime",twoDaysLaterDateString);
+
+        }
+
+
+        retrofitClient = RetrofitClient.getInstance();
+        retrofitInterface = RetrofitClient.getRetrofitInterface();
+
 
         BootpayAnalytics.init(this, "65c84e9000c78a001d3462aa");
         rentalButton.setOnClickListener(new View.OnClickListener() {
@@ -110,8 +163,27 @@ public class UmbrellaDetail extends AppCompatActivity {
                     public void onDone(@Nullable String message) {
 
                         Log.d("done", message);
-                        Intent intent = new Intent(UmbrellaDetail.this, RentalfinishActivity.class);
-                        startActivity(intent);
+
+                        Call<ResponseBody> call = retrofitInterface.rentalUmbrella(rentalUmbMap);
+
+                        call.clone().enqueue(new Callback<ResponseBody>() {
+                            @Override
+                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+
+                                Toast.makeText(getApplicationContext(),"우산 대여완료",Toast.LENGTH_SHORT).show();
+
+                                Intent intent = new Intent(UmbrellaDetail.this, RentalfinishActivity.class);
+                                startActivity(intent);
+                            }
+
+                            @Override
+                            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                            }
+                        });
+
+
+
 
                     }
                 })
