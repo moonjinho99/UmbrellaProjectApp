@@ -43,7 +43,6 @@ public class UmbrellaDetail extends AppCompatActivity {
     private RetrofitInterface retrofitInterface;
     private RetrofitClient retrofitClient;
 
-    private static final int CAMERA_PERMISSION_REQUEST_CODE = 1;
     private int stuck = 10;
 
     TextView locknum_detail;

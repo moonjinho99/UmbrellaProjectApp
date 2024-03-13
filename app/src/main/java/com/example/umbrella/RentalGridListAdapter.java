@@ -14,7 +14,6 @@ import com.example.umbrella.dto.UmbrellaDTO;
 import java.util.ArrayList;
 
 public class RentalGridListAdapter extends BaseAdapter {
-    private static final int CAMERA_PERMISSION_REQUEST_CODE = 1;
     ArrayList<UmbrellaDTO> items = new ArrayList<UmbrellaDTO>();
     Context context;
 
