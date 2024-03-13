@@ -1,7 +1,6 @@
 package com.example.umbrella;
 
 import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +14,7 @@ import com.example.umbrella.dto.UmbrellaDTO;
 import java.util.ArrayList;
 
 public class RentalGridListAdapter extends BaseAdapter {
+    private static final int CAMERA_PERMISSION_REQUEST_CODE = 1;
     ArrayList<UmbrellaDTO> items = new ArrayList<UmbrellaDTO>();
     Context context;
 
@@ -58,10 +58,12 @@ public class RentalGridListAdapter extends BaseAdapter {
         returnBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+//                QRCodeScannerUtil.startScan(MainActivity.class); 이게 안돼용 ㅠㅠ
                 Toast.makeText(context,"반납하기",Toast.LENGTH_SHORT).show();
             }
         });
 
         return convertView;
     }
+
 }

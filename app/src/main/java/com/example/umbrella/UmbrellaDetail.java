@@ -1,8 +1,6 @@
 package com.example.umbrella;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,16 +9,11 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.example.umbrella.service.RetrofitClient;
 import com.example.umbrella.service.RetrofitInterface;
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -116,17 +109,10 @@ public class UmbrellaDetail extends AppCompatActivity {
             }
         });
 
-        // 카메라 권한 요청
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
-                    CAMERA_PERMISSION_REQUEST_CODE);
-        }
-
         scanQRButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startScanning();
+                QRCodeScannerUtil.startScan(UmbrellaDetail.this);
             }
         });
     }
@@ -218,42 +204,25 @@ public class UmbrellaDetail extends AppCompatActivity {
 
     // 카메라 권한 체크
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "카메라 권한 확인.", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, "카메라 권한이 필요합니다.", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-    // 카메라 스캔 시작 메소드
-    private void startScanning() {
-        IntentIntegrator integrator = new IntentIntegrator(this);
-        integrator.setOrientationLocked(false); // 세로 방향으로 QR 코드를 스캔합니다.
-        integrator.setBeepEnabled(false);
-        integrator.initiateScan();
+        QRCodeScannerUtil.handlePermissionsResult(this, requestCode, permissions, grantResults);
     }
 
     // 스캔 시 작동 메소드
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-        if (result != null) {
-            if (result.getContents() == null) {
-                Toast.makeText(this, "취소되었습니다.", Toast.LENGTH_SHORT).show();
-            } else {
-                String scannedData = result.getContents();
-                // 스캔된 데이터를 사용합니다.
-                Toast.makeText(this, "스캔 결과: " + scannedData, Toast.LENGTH_SHORT).show();
+        QRCodeScannerUtil.handleResult(requestCode, resultCode, data, new QRCodeScannerUtil.QRScanResultHandler() {
+            @Override
+            public void onSuccess(String scannedText) {
+                Toast.makeText(UmbrellaDetail.this, "스캔 결과: " + scannedText, Toast.LENGTH_LONG).show();
             }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
+
+            @Override
+            public void onFailure() {
+                Toast.makeText(UmbrellaDetail.this, "스캔 취소", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }
