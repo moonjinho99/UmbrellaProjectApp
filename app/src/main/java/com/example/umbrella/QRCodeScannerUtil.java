@@ -26,7 +26,7 @@ public class QRCodeScannerUtil {
     // 카메라 스캔 시작 메소드
     private static void initiateScan(Activity activity) {
         IntentIntegrator integrator = new IntentIntegrator(activity);
-        integrator.setOrientationLocked(false);
+        integrator.setOrientationLocked(true);
         integrator.initiateScan();
     }
 

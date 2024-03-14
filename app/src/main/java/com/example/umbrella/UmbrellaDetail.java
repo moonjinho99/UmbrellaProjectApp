@@ -47,11 +47,13 @@ public class UmbrellaDetail extends AppCompatActivity {
 
     TextView locknum_detail;
 
-    Button rentalButton, scanQRButton;
+    Button rentalButton;
 
     int umbrella_code=0;
 
     Map<String,Object> rentalUmbMap = new HashMap<>();
+
+    View view;
 
 
     @Override
@@ -62,7 +64,6 @@ public class UmbrellaDetail extends AppCompatActivity {
         locknum_detail = (TextView) findViewById(R.id.locknum_detail);
 
         rentalButton = (Button) findViewById(R.id.rentalBtn_detail);
-        scanQRButton = (Button) findViewById(R.id.scanQRcode);
 
         Intent intent = getIntent();
         locknum_detail.setText(intent.getStringExtra("locknum"));
@@ -104,13 +105,7 @@ public class UmbrellaDetail extends AppCompatActivity {
         rentalButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onClick_request(view);
-            }
-        });
-
-        scanQRButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+//                onClick_request(view);
                 QRCodeScannerUtil.startScan(UmbrellaDetail.this);
             }
         });
@@ -215,7 +210,11 @@ public class UmbrellaDetail extends AppCompatActivity {
         QRCodeScannerUtil.handleResult(requestCode, resultCode, data, new QRCodeScannerUtil.QRScanResultHandler() {
             @Override
             public void onSuccess(String scannedText) {
+                Log.e("스캔 결과: ", scannedText);
                 Toast.makeText(UmbrellaDetail.this, "스캔 결과: " + scannedText, Toast.LENGTH_LONG).show();
+
+                // 스캔 성공 시 결제창으로 이동
+                onClick_request(view);
             }
 
             @Override

@@ -43,6 +43,9 @@
         <!--현식 : cd47301ae9f336d215772c61e24bfa5c
         진호 : f51daad1a23e5ab78886c63a033e1765-->
 
+        <activity android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:screenOrientation="fullSensor"
+            tools:replace="screenOrientation"/>
 
         <activity
             android:name=".MainActivity"
@@ -64,6 +67,10 @@
             android:exported="false" />
         <activity
             android:name=".UmbrellalistActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ReturnResultActivity"
             android:exported="false" />
     </application>
 

@@ -410,7 +410,12 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
         QRCodeScannerUtil.handleResult(requestCode, resultCode, data, new QRCodeScannerUtil.QRScanResultHandler() {
             @Override
             public void onSuccess(String scannedText) {
+                Log.e("스캔 결과: ", scannedText);
                 Toast.makeText(MainActivity.this, "스캔 결과: " + scannedText, Toast.LENGTH_LONG).show();
+
+                Intent intent = new Intent(MainActivity.this, ReturnResultActivity.class);
+                intent.putExtra("scannedText", scannedText);
+                startActivity(intent);
             }
 
             @Override
