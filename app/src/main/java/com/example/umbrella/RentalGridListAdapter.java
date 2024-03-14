@@ -1,5 +1,6 @@
 package com.example.umbrella;
 
+import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.umbrella.dto.UmbrellaDTO;
 
@@ -57,8 +57,8 @@ public class RentalGridListAdapter extends BaseAdapter {
         returnBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                QRCodeScannerUtil.startScan(MainActivity.class); 이게 안돼용 ㅠㅠ
-                Toast.makeText(context,"반납하기",Toast.LENGTH_SHORT).show();
+                QRCodeScannerUtil.startScan((Activity) context);
+//                Toast.makeText(context,"반납하기",Toast.LENGTH_SHORT).show();
             }
         });
 

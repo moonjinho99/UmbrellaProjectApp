@@ -402,4 +402,21 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
     public void onDraggablePOIItemMoved(MapView mapView, MapPOIItem mapPOIItem, MapPoint mapPoint) {
 
     }
+
+    // 스캔 시 작동 메소드
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        QRCodeScannerUtil.handleResult(requestCode, resultCode, data, new QRCodeScannerUtil.QRScanResultHandler() {
+            @Override
+            public void onSuccess(String scannedText) {
+                Toast.makeText(MainActivity.this, "스캔 결과: " + scannedText, Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailure() {
+                Toast.makeText(MainActivity.this, "스캔 취소", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
 }
