@@ -2,6 +2,7 @@ package com.example.umbrella.service;
 
 import com.example.umbrella.dto.LockerDto;
 import com.example.umbrella.dto.MemberDto;
+import com.example.umbrella.dto.ReturnBoxDto;
 import com.example.umbrella.dto.UmbrellaDTO;
 
 import java.util.List;
@@ -47,4 +48,8 @@ public interface RetrofitInterface {
 
     @POST("my_rental_umbrella")
     Call<List<UmbrellaDTO>> getMyRentalUmbrella(@Body Map<String,Object> rentalUmbInfo);
+
+    @POST("return_umbrella")
+    Call<ResponseBody> returnUmbrella(@Body Map<String,Object> returnUmbMap);
+
 }

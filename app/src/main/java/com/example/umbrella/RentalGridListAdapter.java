@@ -2,6 +2,7 @@ package com.example.umbrella;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,8 @@ import java.util.ArrayList;
 
 public class RentalGridListAdapter extends BaseAdapter {
     ArrayList<UmbrellaDTO> items = new ArrayList<UmbrellaDTO>();
+
+    public static String returnUmbName = "";
     Context context;
 
     public void addItem(UmbrellaDTO item){
@@ -57,6 +60,7 @@ public class RentalGridListAdapter extends BaseAdapter {
         returnBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                returnUmbName = name.getText().toString();
                 QRCodeScannerUtil.startScan((Activity) context);
 //                Toast.makeText(context,"반납하기",Toast.LENGTH_SHORT).show();
             }

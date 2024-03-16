@@ -25,6 +25,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.example.umbrella.dto.LockerDto;
+import com.example.umbrella.dto.ReturnBoxDto;
 import com.example.umbrella.dto.UmbrellaDTO;
 import com.example.umbrella.service.RetrofitClient;
 import com.example.umbrella.service.RetrofitInterface;
@@ -41,6 +42,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -77,6 +79,9 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
     Call<List<LockerDto>> callLocker;
 
     Call<List<UmbrellaDTO>> callRentalUmb;
+
+    Call<ResponseBody> returnUmb;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -411,11 +416,34 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
             @Override
             public void onSuccess(String scannedText) {
                 Log.e("스캔 결과: ", scannedText);
-                Toast.makeText(MainActivity.this, "스캔 결과: " + scannedText, Toast.LENGTH_LONG).show();
+                //Toast.makeText(MainActivity.this, "스캔 결과: " + scannedText, Toast.LENGTH_LONG).show();
 
-                Intent intent = new Intent(MainActivity.this, ReturnResultActivity.class);
-                intent.putExtra("scannedText", scannedText);
-                startActivity(intent);
+                String returnBoxcode = "re01";
+                String returnBoxDetailcode = returnBoxcode+"_"+RentalGridListAdapter.returnUmbName.toString();
+
+                Map<String,Object> returnUmbMap = new HashMap<>();
+
+                returnUmbMap.put("returnBoxDetailcode",returnBoxDetailcode);
+                returnUmbMap.put("returnBoxcode",returnBoxcode);
+                returnUmbMap.put("umbrellacode",RentalGridListAdapter.returnUmbName);
+                returnUmbMap.put("memberId",LoginActivity.loginId);
+
+                returnUmb = retrofitInterface.returnUmbrella(returnUmbMap);
+
+                returnUmb.clone().enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        Toast.makeText(MainActivity.this,"반납되었습니다." , Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(MainActivity.this, ReturnResultActivity.class);
+                        intent.putExtra("scannedText", scannedText);
+                        startActivity(intent);
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                    }
+                });
             }
 
             @Override

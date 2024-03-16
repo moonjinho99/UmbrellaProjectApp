@@ -58,8 +58,11 @@ public class GridListAdapter extends BaseAdapter {
             rentalBtn.setText("대여중");
         }
 
-        name.setText(Integer.toString(listitem.getUmbrellacode()));
-        price.setText(Integer.toString(listitem.getPrice()));
+        if(listitem.getRentalStatus() == 1 || listitem.getRentalStatus() == 0)
+        {
+            name.setText(Integer.toString(listitem.getUmbrellacode()));
+            price.setText(Integer.toString(listitem.getPrice()));
+        }
 
         rentalBtn.setOnClickListener(new View.OnClickListener() {
             @Override
