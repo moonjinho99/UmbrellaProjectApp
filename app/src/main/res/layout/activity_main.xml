@@ -75,8 +75,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:id="@+id/updateInfoBtn"
-                    android:text="내정보 수정"
+                    android:id="@+id/managedInfoBtn"
+                    android:text="내정보 관리"
                     ></Button>
                 <Button
                     android:layout_width="wrap_content"
@@ -116,14 +116,91 @@
                     android:orientation="vertical"
                     android:visibility="invisible"
                     >
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="회원 정보 수정"
-                        android:textSize="30dp"></TextView>
+                        android:gravity="center_vertical"
+                        android:orientation="vertical"
+                        android:padding="10dp"
+                        >
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="아이디 : "
+                            android:textSize="20dp"></TextView>
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="사용자의 아이디"
+                            android:textSize="20dp"
+                            android:id="@+id/managedId">
+                        </TextView>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="사용자명 : "
+                            android:textSize="20dp"></TextView>
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="사용자의 이름"
+                            android:textSize="20dp"
+                            android:id="@+id/managedname">
+                        </TextView>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="잔화번호 : "
+                            android:textSize="20dp"></TextView>
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="사용자의 전화번호"
+                            android:textSize="20dp"
+                            android:id="@+id/managedPhone">
+                        </TextView>
+                    </LinearLayout>
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_centerInParent="true"
+                        android:background="#dcdcdc"/>
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="패스워드 변경"
+                        android:textSize="15dp"
+                        android:layout_marginTop="5dp"
+                        android:id="@+id/managed_updatePwBtn"></Button>
+
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="내정보 수정"
+                        android:textSize="15dp"
+                        android:id="@+id/managed_updateInfoBtn"></Button>
 
                 </LinearLayout>
-
+                </LinearLayout>
 
             </FrameLayout>
         </LinearLayout>

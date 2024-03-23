@@ -33,7 +33,7 @@ import retrofit2.Response;
 public class LoginActivity extends AppCompatActivity {
 
     public static String loginId = "";
-    private List<MemberDto> loginInfo;
+    public static List<MemberDto> loginInfo;
     EditText id, pwd;
     Button loginBtn, joinBtn;
 

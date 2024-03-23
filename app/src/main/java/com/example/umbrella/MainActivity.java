@@ -1,6 +1,9 @@
 package com.example.umbrella;
 
 import android.Manifest;
+import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -11,9 +14,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -22,6 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
@@ -69,7 +75,13 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
     private LinearLayout rentalLayout,updateInfoLayout;
     private GridView rentalGrid;
 
-    private Button rentalBtn,updateInfo;
+    private Button rentalBtn,managedInfo;
+
+
+    //내정보-> 내정보 관리
+    private Button managed_updatePwBtn, managed_updateInfoBtn;
+
+    private TextView managedId, managedName, managedPhone;
 
     private ImageView qrImageView;
 
@@ -102,7 +114,16 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
         rentalBtn = findViewById(R.id.rentalMyUmbBtn);
 
         updateInfoLayout = findViewById(R.id.updateInfoLayout);
-        updateInfo = findViewById(R.id.updateInfoBtn);
+        managedInfo = findViewById(R.id.managedInfoBtn);
+
+        managed_updatePwBtn = findViewById(R.id.managed_updatePwBtn);
+        managed_updateInfoBtn = findViewById(R.id.managed_updateInfoBtn);
+        managedId = findViewById(R.id.managedId);
+        managedName = findViewById(R.id.managedname);
+        managedPhone = findViewById(R.id.managedPhone);
+        managedId.setText(LoginActivity.loginInfo.get(0).getId());
+        managedName.setText(LoginActivity.loginInfo.get(0).getName());
+        managedPhone.setText(LoginActivity.loginInfo.get(0).getPhone());
 
         retrofitClient = RetrofitClient.getInstance();
         retrofitInterface = RetrofitClient.getRetrofitInterface();
@@ -179,14 +200,31 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
             }
         });
 
-        updateInfo.setOnClickListener(new View.OnClickListener() {
+        managedInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 rentalLayout.setVisibility(View.INVISIBLE);
                 updateInfoLayout.setVisibility(View.VISIBLE);
             }
         });
-        
+
+        //내정보-> 다이얼로그 띄우기
+
+        managed_updatePwBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showUpdatePwDialog(MainActivity.this);
+            }
+        });
+
+        managed_updateInfoBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+
+            }
+        });
+
         lockerList = new ArrayList<>();
         //지도에 보관함 표시
         callLocker = retrofitInterface.getLockerList();
@@ -260,6 +298,8 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
 
             }
         });
+
+
 
     }
     // 권한 체크 이후로직
@@ -459,6 +499,7 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
         });
     }
 
+
     // 입력한 값으로 QR코드 생성 후 이미지로 변환
 //    private void generateAndDisplayQRCode(String text) {
 //        Bitmap qrCodeBitmap = QRCodeGenerator.generateQRCode(text);
@@ -468,4 +509,66 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
 //            // QR 코드 생성에 실패한 경우 처리할 코드
 //        }
 //    }
+
+    //패스워드 변경
+    public void showUpdatePwDialog(Context context) {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
+
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View dialogView = inflater.inflate(R.layout.updatepw_dialog, null);
+        dialogBuilder.setView(dialogView);
+
+        AlertDialog alertDialog = dialogBuilder.create();
+        alertDialog.show();
+
+        /*
+        current_pw : 입력한 현재 패스워드
+        check_pw_msg : 입력한 현재 패스워드가 일치하는지 확인하고 출력시키는 TextView
+                        (invisible로 해뒀기 때문에 일치하면 visible로 바꿔주고 글색을 초록색으로,
+                        일치하지않으면 visible로 바꾸고 글색을 빨간색으로 변경)
+        update_pw : 입력한 수정할 패스워드
+        updatepw_btn : 변경하기 클릭
+        cancel_btn : 취소 클릭
+
+        #### LoginActivity.loginInfo.get(0)에 로그인한 회원정보가 들어있음 ####
+        ==> type : List<MemberDTO>
+        */
+        EditText current_pw = dialogView.findViewById(R.id.current_pw);
+        EditText update_pw = dialogView.findViewById(R.id.update_pw);
+        TextView check_pw_msg = dialogView.findViewById(R.id.check_pw);
+        Button updatepw_btn = dialogView.findViewById(R.id.updatePwBtn);
+        Button cancel_btn = dialogView.findViewById(R.id.cancelBtn);
+
+        dialogBuilder.setTitle("패스워드 변경");
+
+        updatepw_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getApplicationContext(),"패스워드 변경",Toast.LENGTH_SHORT).show();
+                //여기서 패스워드 변경 로직 작성하면됨
+            }
+        });
+
+        cancel_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                alertDialog.dismiss();
+            }
+        });
+    }
+
+
+    //회원 정보 변경
+    public void showUpdateInfoDialog(Context context) {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
+
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View dialogView = inflater.inflate(R.layout.updateinfo_dialog, null);
+        dialogBuilder.setView(dialogView);
+
+        AlertDialog alertDialog = dialogBuilder.create();
+        alertDialog.show();
+        
+    }
+
 }
