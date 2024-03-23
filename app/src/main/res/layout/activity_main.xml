@@ -86,6 +86,7 @@
                     android:text="대여중인 우산"
                     ></Button>
             </LinearLayout>
+
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
@@ -125,7 +126,6 @@
 
 
             </FrameLayout>
-
         </LinearLayout>
     </FrameLayout>
     <View

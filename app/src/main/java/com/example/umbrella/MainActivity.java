@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,7 +26,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.example.umbrella.dto.LockerDto;
-import com.example.umbrella.dto.ReturnBoxDto;
 import com.example.umbrella.dto.UmbrellaDTO;
 import com.example.umbrella.service.RetrofitClient;
 import com.example.umbrella.service.RetrofitInterface;
@@ -71,6 +71,8 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
 
     private Button rentalBtn,updateInfo;
 
+    private ImageView qrImageView;
+
 
     double latitude,longitude;
 
@@ -104,6 +106,10 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
 
         retrofitClient = RetrofitClient.getInstance();
         retrofitInterface = RetrofitClient.getRetrofitInterface();
+
+//        qrImageView = findViewById(R.id.qr_code_image);
+        // 텍스트를 QR 코드로 변환하여 ImageView에 표시
+//        generateAndDisplayQRCode("re01");
 
         Intent intent = getIntent();
 
@@ -416,34 +422,34 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
             @Override
             public void onSuccess(String scannedText) {
                 Log.e("스캔 결과: ", scannedText);
-                //Toast.makeText(MainActivity.this, "스캔 결과: " + scannedText, Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "스캔 결과: " + scannedText, Toast.LENGTH_LONG).show();
 
-                String returnBoxcode = "re01";
-                String returnBoxDetailcode = returnBoxcode+"_"+RentalGridListAdapter.returnUmbName.toString();
-
-                Map<String,Object> returnUmbMap = new HashMap<>();
-
-                returnUmbMap.put("returnBoxDetailcode",returnBoxDetailcode);
-                returnUmbMap.put("returnBoxcode",returnBoxcode);
-                returnUmbMap.put("umbrellacode",RentalGridListAdapter.returnUmbName);
-                returnUmbMap.put("memberId",LoginActivity.loginId);
-
-                returnUmb = retrofitInterface.returnUmbrella(returnUmbMap);
-
-                returnUmb.clone().enqueue(new Callback<ResponseBody>() {
-                    @Override
-                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                        Toast.makeText(MainActivity.this,"반납되었습니다." , Toast.LENGTH_LONG).show();
-                        Intent intent = new Intent(MainActivity.this, ReturnResultActivity.class);
-                        intent.putExtra("scannedText", scannedText);
-                        startActivity(intent);
-                    }
-
-                    @Override
-                    public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-                    }
-                });
+//                String returnBoxcode = "re01";
+//                String returnBoxDetailcode = returnBoxcode+"_"+RentalGridListAdapter.returnUmbName.toString();
+//
+//                Map<String,Object> returnUmbMap = new HashMap<>();
+//
+//                returnUmbMap.put("returnBoxDetailcode",returnBoxDetailcode);
+//                returnUmbMap.put("returnBoxcode",returnBoxcode);
+//                returnUmbMap.put("umbrellacode",RentalGridListAdapter.returnUmbName);
+//                returnUmbMap.put("memberId",LoginActivity.loginId);
+//
+//                returnUmb = retrofitInterface.returnUmbrella(returnUmbMap);
+//
+//                returnUmb.clone().enqueue(new Callback<ResponseBody>() {
+//                    @Override
+//                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//                        Toast.makeText(MainActivity.this,"반납되었습니다." , Toast.LENGTH_LONG).show();
+//                        Intent intent = new Intent(MainActivity.this, ReturnResultActivity.class);
+//                        intent.putExtra("scannedText", scannedText);
+//                        startActivity(intent);
+//                    }
+//
+//                    @Override
+//                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+//
+//                    }
+//                });
             }
 
             @Override
@@ -452,4 +458,14 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
             }
         });
     }
+
+    // 입력한 값으로 QR코드 생성 후 이미지로 변환
+//    private void generateAndDisplayQRCode(String text) {
+//        Bitmap qrCodeBitmap = QRCodeGenerator.generateQRCode(text);
+//        if (qrCodeBitmap != null) {
+//            qrImageView.setImageBitmap(qrCodeBitmap);
+//        } else {
+//            // QR 코드 생성에 실패한 경우 처리할 코드
+//        }
+//    }
 }
