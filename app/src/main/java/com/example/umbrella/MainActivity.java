@@ -1,13 +1,12 @@
 package com.example.umbrella;
 
 import android.Manifest;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Build;
@@ -32,9 +31,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.example.umbrella.dto.LockerDto;
+import com.example.umbrella.dto.MemberDto;
 import com.example.umbrella.dto.UmbrellaDTO;
 import com.example.umbrella.service.RetrofitClient;
 import com.example.umbrella.service.RetrofitInterface;
+import com.google.gson.Gson;
 
 import net.daum.mf.map.api.MapPOIItem;
 import net.daum.mf.map.api.MapPoint;
@@ -54,7 +55,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements MapView.CurrentLocationEventListener, MapView.MapViewEventListener, MapView.POIItemEventListener {
-
+    private int type = 0;   // 0: 비밀번호 비교, 1: 비밀번호 변경
     private MapView mapView;
     private ViewGroup mapViewContainer;
 
@@ -72,10 +73,10 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
 
     private LinearLayout mypage_layout, map_layout;
 
-    private LinearLayout rentalLayout,updateInfoLayout;
+    private LinearLayout rentalLayout, updateInfoLayout;
     private GridView rentalGrid;
 
-    private Button rentalBtn,managedInfo;
+    private Button rentalBtn, managedInfo;
 
 
     //내정보-> 내정보 관리
@@ -86,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
     private ImageView qrImageView;
 
 
-    double latitude,longitude;
+    double latitude, longitude;
 
     TextView id, name;
 
@@ -101,8 +102,8 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mypageBtn = (ImageButton)findViewById(R.id.mypageBtn);
-        mapBtn = (ImageButton)findViewById(R.id.mapBtn);
+        mypageBtn = (ImageButton) findViewById(R.id.mypageBtn);
+        mapBtn = (ImageButton) findViewById(R.id.mapBtn);
         map_layout = (LinearLayout) findViewById(R.id.map_view);
         mypage_layout = (LinearLayout) findViewById(R.id.mypage);
 
@@ -241,12 +242,11 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
             public void onResponse(Call<List<LockerDto>> call, Response<List<LockerDto>> response) {
                 lockerList = response.body();
                 if (response.isSuccessful()) {
-                    Log.e("보관함리스트",lockerList.toString());
+                    Log.e("보관함리스트", lockerList.toString());
 
-                    for(int i=0; i<lockerList.size(); i++)
-                    {
+                    for (int i = 0; i < lockerList.size(); i++) {
                         getLatLngFromAddress(lockerList.get(i).getLockerAddr());
-                        Log.e("보관함상세",lockerList.get(i).getLockerAddr());
+                        Log.e("보관함상세", lockerList.get(i).getLockerAddr());
                         MapPoint mapPoint = MapPoint.mapPointWithGeoCoord(latitude, longitude);
 
                         marker = new MapPOIItem();
@@ -257,8 +257,7 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
                         mapView.addPOIItem(marker);
                         mapView.setMapCenterPoint(mapPoint, true);
                     }
-                }
-                else{
+                } else {
                     Toast.makeText(getApplicationContext(), "가져오기 실패", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -271,9 +270,9 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
 
         mapView.setPOIItemEventListener(this);
 
-        Map<String,Object> myInfo = new HashMap<>();
-        myInfo.put("rentalId",userId);
-        myInfo.put("rentalStatus",1);
+        Map<String, Object> myInfo = new HashMap<>();
+        myInfo.put("rentalId", userId);
+        myInfo.put("rentalStatus", 1);
 
         callRentalUmb = retrofitInterface.getMyRentalUmbrella(myInfo);
 
@@ -285,8 +284,7 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
 
                 RentalGridListAdapter rentalGridListAdapter = new RentalGridListAdapter();
 
-                for (int i=0; i<rentalUmbList.size(); i++)
-                {
+                for (int i = 0; i < rentalUmbList.size(); i++) {
                     rentalGridListAdapter.addItem(rentalUmbList.get(i));
                 }
 
@@ -300,8 +298,8 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
         });
 
 
-
     }
+
     // 권한 체크 이후로직
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grandResults) {
@@ -426,11 +424,11 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
     @Override
     public void onCalloutBalloonOfPOIItemTouched(MapView mapView, MapPOIItem mapPOIItem, MapPOIItem.CalloutBalloonButtonType calloutBalloonButtonType) {
 
-        Log.e("마커","전");
+        Log.e("마커", "전");
 
         Call<List<UmbrellaDTO>> call = retrofitInterface.getUmbrellaList(mapPOIItem.getItemName());
 
-        Log.e("마커","후");
+        Log.e("마커", "후");
         call.clone().enqueue(new Callback<List<UmbrellaDTO>>() {
             @Override
             public void onResponse(Call<List<UmbrellaDTO>> call, Response<List<UmbrellaDTO>> response) {
@@ -544,8 +542,99 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
         updatepw_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getApplicationContext(),"패스워드 변경",Toast.LENGTH_SHORT).show();
-                //여기서 패스워드 변경 로직 작성하면됨
+                // 공란이 존재하는 경우
+                if (current_pw.getText().toString().isEmpty() || update_pw.getText().toString().isEmpty()) {
+                    Toast.makeText(getApplicationContext(), "공란 없이 입력해 주세요", Toast.LENGTH_SHORT).show();
+                }
+
+                // 비밀번호 비교
+                if (type == 0) {
+                    MemberDto memberDto = new MemberDto();
+                    memberDto.setId(LoginActivity.loginInfo.get(0).getId());
+                    memberDto.setPw(current_pw.getText().toString());
+                    Gson gson = new Gson();
+                    String userInfo = gson.toJson(memberDto);
+
+                    Log.e("JSON", userInfo);
+
+                    Call<ResponseBody> pwCheckCall = retrofitInterface.pwCheck(memberDto);
+
+                    // 비밀번호 변경 시 입력한 비밀번호와 DB에 저장된 비밀번호를 비교
+                    pwCheckCall.clone().enqueue(new Callback<ResponseBody>() {
+                        @Override
+                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                            Log.e("연결 ", "성공");
+                            if (response.isSuccessful()) {
+                                try {
+                                    // 입력한 비밀번호가 DB에 저장되어 있는 비밀번호와 일치하는 경우
+                                    if (response.body().string().equals("success")) {
+                                        check_pw_msg.setVisibility(View.VISIBLE);
+                                        check_pw_msg.setText("비밀번호 일치");
+                                        check_pw_msg.setTextColor(Color.GREEN);
+                                        type = 1;
+                                    } else {
+                                        check_pw_msg.setVisibility(View.VISIBLE);
+                                        check_pw_msg.setText("비밀번호가 일치하지 않습니다");
+                                        check_pw_msg.setTextColor(Color.RED);
+                                        type = 0;
+                                    }
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+                            Log.e("연결 ", t.getMessage());
+                            Toast.makeText(getApplicationContext(), "서버 연결 실패", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                }
+                // 비밀번호 변경
+                else if (type == 1) {
+                    MemberDto memberDto = new MemberDto();
+                    memberDto.setId(LoginActivity.loginInfo.get(0).getId());
+                    memberDto.setPw(update_pw.getText().toString());
+                    Gson gson = new Gson();
+                    String userInfo = gson.toJson(memberDto);
+
+                    Log.e("JSON", userInfo);
+
+                    Call<ResponseBody> pwUpdateCall = retrofitInterface.pwUpdate(memberDto);
+
+                    // 비밀번호 변경
+                    pwUpdateCall.clone().enqueue(new Callback<ResponseBody>() {
+                        @Override
+                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                            Log.e("연결 ", "성공");
+                            if (response.isSuccessful()) {
+                                try {
+                                    if (response.body().string().equals("success")) {
+                                        Toast.makeText(getApplicationContext(), "비밀번호 변경 성공, 다시 로그인 해주세요", Toast.LENGTH_SHORT).show();
+                                        alertDialog.dismiss();
+
+                                        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                                        startActivity(intent);
+
+                                        type = 0;
+                                    } else {
+                                        Toast.makeText(getApplicationContext(), "비밀번호 변경 실패", Toast.LENGTH_SHORT).show();
+                                    }
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+                            Log.e("연결 ", t.getMessage());
+                            Toast.makeText(getApplicationContext(), "서버 연결 실패", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
             }
         });
 
@@ -568,7 +657,7 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
 
         AlertDialog alertDialog = dialogBuilder.create();
         alertDialog.show();
-        
+
     }
 
 }

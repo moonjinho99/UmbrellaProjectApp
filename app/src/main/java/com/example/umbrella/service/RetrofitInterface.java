@@ -2,7 +2,6 @@ package com.example.umbrella.service;
 
 import com.example.umbrella.dto.LockerDto;
 import com.example.umbrella.dto.MemberDto;
-import com.example.umbrella.dto.ReturnBoxDto;
 import com.example.umbrella.dto.UmbrellaDTO;
 
 import java.util.List;
@@ -51,5 +50,13 @@ public interface RetrofitInterface {
 
     @POST("return_umbrella")
     Call<ResponseBody> returnUmbrella(@Body Map<String,Object> returnUmbMap);
+
+    // 비밀번호 변경 시 입력한 비밀번호 일치 확인
+    @POST("pw-check")
+    Call<ResponseBody> pwCheck(@Body MemberDto jsonUser);
+
+    // 비밀번호 변경
+    @POST("pw-update")
+    Call<ResponseBody> pwUpdate(@Body MemberDto jsonUser);
 
 }

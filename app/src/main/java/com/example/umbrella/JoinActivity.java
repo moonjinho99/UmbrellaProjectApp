@@ -36,12 +36,12 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class JoinActivity extends AppCompatActivity {
-    private EditText id, username, pwd, pwdck, phone, certNum;
-    private TextView idCheck, pwdCheck, certNumCheck;
+    private EditText id, username, pw, pwck, phone, certNum;
+    private TextView idCheck, pwCheck, certNumCheck;
     private Button idCheckBtn, phoneCheckBtn, joinBtn, cancelBtn;
 
     // 유효성 검사 타입 변수(0:실패, 1:성공)
-    int idType, pwdType, certNumType = 0;
+    int idType, pwType, certNumType = 0;
 
     private static final String TAG = "JoinActivity";
     private static final int PERMISSION_REQUEST_CODE = 1;
@@ -55,13 +55,13 @@ public class JoinActivity extends AppCompatActivity {
 
         id = findViewById(R.id.userId);
         username = findViewById(R.id.userName);
-        pwd = findViewById(R.id.userPwd);
-        pwdck = findViewById(R.id.userPwdck);
+        pw = findViewById(R.id.userPw);
+        pwck = findViewById(R.id.userPwck);
         phone = findViewById(R.id.userPhone);
         certNum = findViewById(R.id.certNum);
 
         idCheck = findViewById(R.id.idCheckText);
-        pwdCheck = findViewById(R.id.pwdCheckText);
+        pwCheck = findViewById(R.id.pwCheckText);
         certNumCheck = findViewById(R.id.certNumText);
 
         idCheckBtn = findViewById(R.id.idCheck_button);
@@ -140,17 +140,17 @@ public class JoinActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // 비밀번호 확인
-                if (!(pwd.getText().toString().equals(pwdck.getText().toString()))) {
-                    pwdCheck.setVisibility(View.VISIBLE);
-                    pwdCheck.setText("비밀번호가 일치하지 않습니다.");
-                    pwdCheck.setTextColor(Color.RED);
-                    pwdType = 0;
+                if (!(pw.getText().toString().equals(pwck.getText().toString()))) {
+                    pwCheck.setVisibility(View.VISIBLE);
+                    pwCheck.setText("비밀번호가 일치하지 않습니다.");
+                    pwCheck.setTextColor(Color.RED);
+                    pwType = 0;
                 } else {
-                    if (!(pwd.getText().toString().isEmpty() && pwdck.getText().toString().isEmpty())) {
-                        pwdCheck.setVisibility(View.VISIBLE);
-                        pwdCheck.setText("비밀번호가 일치합니다.");
-                        pwdCheck.setTextColor(Color.GREEN);
-                        pwdType = 1;
+                    if (!(pw.getText().toString().isEmpty() && pwck.getText().toString().isEmpty())) {
+                        pwCheck.setVisibility(View.VISIBLE);
+                        pwCheck.setText("비밀번호가 일치합니다.");
+                        pwCheck.setTextColor(Color.GREEN);
+                        pwType = 1;
                     }
                 }
 
@@ -159,7 +159,7 @@ public class JoinActivity extends AppCompatActivity {
                 MemberDto memberDto = new MemberDto();
                 memberDto.setId(id.getText().toString());
                 memberDto.setName(username.getText().toString());
-                memberDto.setPw(pwd.getText().toString());
+                memberDto.setPw(pw.getText().toString());
                 memberDto.setPhone(phone.getText().toString());
                 Gson gson = new Gson();
                 String userInfo = gson.toJson(memberDto);
@@ -172,11 +172,11 @@ public class JoinActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                         if (id.getText().toString().isEmpty() || username.getText().toString().isEmpty() ||
-                                pwd.getText().toString().isEmpty() || pwdck.getText().toString().isEmpty() ||
+                                pw.getText().toString().isEmpty() || pwck.getText().toString().isEmpty() ||
                                 phone.getText().toString().isEmpty() || certNum.getText().toString().isEmpty()) {
                             Toast.makeText(getApplicationContext(), "빈칸 없이 입력해 주세요.", Toast.LENGTH_SHORT).show();
                         } else {
-                            if (idType == 1 && pwdType == 1 && certNumType == 1) {  // 아이디 중복, 비밀번호 확인, 인증코드 확인 체크
+                            if (idType == 1 && pwType == 1 && certNumType == 1) {  // 아이디 중복, 비밀번호 확인, 인증코드 확인 체크
                                 if (response.isSuccessful()) {
                                     try {
                                         if (response.body().string().equals("success")) {

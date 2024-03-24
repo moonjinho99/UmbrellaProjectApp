@@ -41,7 +41,7 @@
             android:inputType="textPersonName" />
 
         <EditText
-            android:id="@+id/pwd"
+            android:id="@+id/pw"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
