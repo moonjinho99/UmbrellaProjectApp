@@ -52,13 +52,13 @@ public class GridListAdapter extends BaseAdapter {
         TextView price = convertView.findViewById(R.id.price);
         Button rentalBtn = convertView.findViewById(R.id.rentalBtn);
 
-        if(listitem.getRentalStatus() == 1)
+        if(listitem.getRentalStatus() == 3)
         {
             rentalBtn.setEnabled(false);
             rentalBtn.setText("대여중");
         }
 
-        if(listitem.getRentalStatus() == 1 || listitem.getRentalStatus() == 0)
+        if(listitem.getRentalStatus() == 3 || listitem.getRentalStatus() == 1)
         {
             name.setText(Integer.toString(listitem.getUmbrellacode()));
             price.setText(Integer.toString(listitem.getPrice()));

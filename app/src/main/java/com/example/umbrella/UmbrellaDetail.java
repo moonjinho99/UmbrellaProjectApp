@@ -73,7 +73,7 @@ public class UmbrellaDetail extends AppCompatActivity {
         //대여한 우산의 상태와 대여 계정 변경을 위한 초기화
         rentalUmbMap.put("umbrella_code", umbrella_code);
         rentalUmbMap.put("rentalId", LoginActivity.loginId);
-        rentalUmbMap.put("rentalStatus", 1);
+        rentalUmbMap.put("rentalStatus", 3);
 
         // 현재 날짜
         LocalDate currentDate = null;

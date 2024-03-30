@@ -59,4 +59,7 @@ public interface RetrofitInterface {
     @POST("pw-update")
     Call<ResponseBody> pwUpdate(@Body MemberDto jsonUser);
 
+    @POST("info_update")
+    Call<ResponseBody> infoUpdate(@Body MemberDto updateMember);
+
 }

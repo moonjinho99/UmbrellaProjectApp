@@ -1,6 +1,7 @@
 package com.example.umbrella;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -86,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
 
     private ImageView qrImageView;
 
+    private Button logoutBtn;
 
     double latitude, longitude;
 
@@ -126,6 +128,8 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
         managedName.setText(LoginActivity.loginInfo.get(0).getName());
         managedPhone.setText(LoginActivity.loginInfo.get(0).getPhone());
 
+        logoutBtn = findViewById(R.id.logoutBtn);
+
         retrofitClient = RetrofitClient.getInstance();
         retrofitInterface = RetrofitClient.getRetrofitInterface();
 
@@ -134,9 +138,12 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
 //        generateAndDisplayQRCode("re01");
 
         Intent intent = getIntent();
+//
+//        String userId = intent.getStringExtra("id");
+//        String userName = intent.getStringExtra("name");
 
-        String userId = intent.getStringExtra("id");
-        String userName = intent.getStringExtra("name");
+        String userId = LoginActivity.loginInfo.get(0).getId();
+        String userName = LoginActivity.loginInfo.get(0).getName();
 
         try {
             PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_SIGNATURES);
@@ -172,6 +179,16 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
             }
             return;
         }
+
+        logoutBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent1 = new Intent(MainActivity.this,LoginActivity.class);
+                LoginActivity.loginId="";
+                LoginActivity.loginInfo=null;
+                startActivity(intent1);
+            }
+        });
 
         mypageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -221,8 +238,7 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
         managed_updateInfoBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-
+                showUpdateInfoDialog(MainActivity.this);
             }
         });
 
@@ -272,7 +288,7 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
 
         Map<String, Object> myInfo = new HashMap<>();
         myInfo.put("rentalId", userId);
-        myInfo.put("rentalStatus", 1);
+        myInfo.put("rentalStatus", 3);
 
         callRentalUmb = retrofitInterface.getMyRentalUmbrella(myInfo);
 
@@ -283,12 +299,12 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
                 rentalUmbList = response.body();
 
                 RentalGridListAdapter rentalGridListAdapter = new RentalGridListAdapter();
-
                 for (int i = 0; i < rentalUmbList.size(); i++) {
                     rentalGridListAdapter.addItem(rentalUmbList.get(i));
                 }
 
                 rentalGrid.setAdapter(rentalGridListAdapter);
+                rentalGridListAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -462,32 +478,32 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
                 Log.e("스캔 결과: ", scannedText);
                 Toast.makeText(MainActivity.this, "스캔 결과: " + scannedText, Toast.LENGTH_LONG).show();
 
-//                String returnBoxcode = "re01";
-//                String returnBoxDetailcode = returnBoxcode+"_"+RentalGridListAdapter.returnUmbName.toString();
-//
-//                Map<String,Object> returnUmbMap = new HashMap<>();
-//
-//                returnUmbMap.put("returnBoxDetailcode",returnBoxDetailcode);
-//                returnUmbMap.put("returnBoxcode",returnBoxcode);
-//                returnUmbMap.put("umbrellacode",RentalGridListAdapter.returnUmbName);
-//                returnUmbMap.put("memberId",LoginActivity.loginId);
-//
-//                returnUmb = retrofitInterface.returnUmbrella(returnUmbMap);
-//
-//                returnUmb.clone().enqueue(new Callback<ResponseBody>() {
-//                    @Override
-//                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-//                        Toast.makeText(MainActivity.this,"반납되었습니다." , Toast.LENGTH_LONG).show();
-//                        Intent intent = new Intent(MainActivity.this, ReturnResultActivity.class);
-//                        intent.putExtra("scannedText", scannedText);
-//                        startActivity(intent);
-//                    }
-//
-//                    @Override
-//                    public void onFailure(Call<ResponseBody> call, Throwable t) {
-//
-//                    }
-//                });
+                String returnBoxcode = "re01";
+                String returnBoxDetailcode = returnBoxcode+"_"+RentalGridListAdapter.returnUmbName.toString();
+
+                Map<String,Object> returnUmbMap = new HashMap<>();
+
+                returnUmbMap.put("returnBoxDetailcode",returnBoxDetailcode);
+                returnUmbMap.put("returnBoxcode",returnBoxcode);
+                returnUmbMap.put("umbrellacode",RentalGridListAdapter.returnUmbName);
+                returnUmbMap.put("memberId",LoginActivity.loginId);
+
+                returnUmb = retrofitInterface.returnUmbrella(returnUmbMap);
+
+                returnUmb.clone().enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        Toast.makeText(MainActivity.this,"반납되었습니다." , Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(MainActivity.this, ReturnResultActivity.class);
+                        intent.putExtra("scannedText", scannedText);
+                        startActivity(intent);
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                    }
+                });
             }
 
             @Override
@@ -658,6 +674,53 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
         AlertDialog alertDialog = dialogBuilder.create();
         alertDialog.show();
 
+        MemberDto memberDto = new MemberDto();
+        EditText update_username = dialogView.findViewById(R.id.update_username);
+        EditText update_phonenum = dialogView.findViewById(R.id.update_phonenum);
+        Button update_btn = dialogView.findViewById(R.id.updateBtn);
+        Button cancel_btn = dialogView.findViewById(R.id.cancelBtn);
+        dialogBuilder.setTitle("패스워드 변경");
+
+        update_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (update_username.getText().toString().isEmpty() || update_phonenum.getText().toString().isEmpty()) {
+                    Toast.makeText(getApplicationContext(), "공란 없이 입력해 주세요", Toast.LENGTH_SHORT).show();
+                }
+                else{
+                    memberDto.setId(LoginActivity.loginId);
+                    memberDto.setPhone(update_phonenum.getText().toString());
+                    memberDto.setName(update_username.getText().toString());
+                    Call<ResponseBody> infoUpdateCall = retrofitInterface.infoUpdate(memberDto);
+
+                    infoUpdateCall.enqueue(new Callback<ResponseBody>() {
+                        @Override
+                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                            Toast.makeText(getApplicationContext(), "회원정보가 수정되었습니다. 다시 로그인 해주세요", Toast.LENGTH_SHORT).show();
+                            alertDialog.dismiss();
+
+                            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                            startActivity(intent);
+                        }
+                        @Override
+                        public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                        }
+                    });
+
+                }
+            }
+        });
+        cancel_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                alertDialog.dismiss();
+            }
+        });
     }
 
+    @SuppressLint("MissingSuperCall")
+    @Override
+    public void onBackPressed() {
+    }
 }

@@ -223,6 +223,7 @@ public class JoinActivity extends AppCompatActivity {
 
         verificationCode = generateVerificationCode();
         String message = "[Web 발신]\n우산의 집 인증코드 : " + verificationCode;
+        Log.e("인증코드",message);
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.SEND_SMS}, PERMISSION_REQUEST_CODE);
