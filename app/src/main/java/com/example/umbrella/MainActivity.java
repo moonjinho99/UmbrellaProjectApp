@@ -33,6 +33,7 @@ import androidx.core.content.ContextCompat;
 
 import com.example.umbrella.dto.LockerDto;
 import com.example.umbrella.dto.MemberDto;
+import com.example.umbrella.dto.ReturnBoxDto;
 import com.example.umbrella.dto.UmbrellaDTO;
 import com.example.umbrella.service.RetrofitClient;
 import com.example.umbrella.service.RetrofitInterface;
@@ -67,6 +68,8 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
 
     private List<UmbrellaDTO> rentalUmbList;
     private MapPOIItem marker;
+
+    private MapPOIItem re_marker;
     private RetrofitInterface retrofitInterface;
     private RetrofitClient retrofitClient;
 
@@ -95,9 +98,15 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
 
     Call<List<LockerDto>> callLocker;
 
+    Call<List<ReturnBoxDto>> callReturnBox;
+
     Call<List<UmbrellaDTO>> callRentalUmb;
 
     Call<ResponseBody> returnUmb;
+
+
+    String userId = LoginActivity.loginInfo.get(0).getId();
+    String userName = LoginActivity.loginInfo.get(0).getName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,12 +147,6 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
 //        generateAndDisplayQRCode("re01");
 
         Intent intent = getIntent();
-//
-//        String userId = intent.getStringExtra("id");
-//        String userName = intent.getStringExtra("name");
-
-        String userId = LoginActivity.loginInfo.get(0).getId();
-        String userName = LoginActivity.loginInfo.get(0).getName();
 
         try {
             PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), PackageManager.GET_SIGNATURES);
@@ -269,7 +272,7 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
                         marker.setItemName(lockerList.get(i).getLockercode());
                         marker.setTag(i);
                         marker.setMapPoint(mapPoint);
-                        marker.setMarkerType(MapPOIItem.MarkerType.BluePin); // Set the marker type
+                        marker.setMarkerType(MapPOIItem.MarkerType.BluePin);
                         mapView.addPOIItem(marker);
                         mapView.setMapCenterPoint(mapPoint, true);
                     }
@@ -289,6 +292,45 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
         Map<String, Object> myInfo = new HashMap<>();
         myInfo.put("rentalId", userId);
         myInfo.put("rentalStatus", 3);
+
+
+        callReturnBox = retrofitInterface.getReturnBoxList();
+
+        callReturnBox.clone().enqueue(new Callback<List<ReturnBoxDto>>() {
+            @Override
+            public void onResponse(Call<List<ReturnBoxDto>> call, Response<List<ReturnBoxDto>> response) {
+
+                List<ReturnBoxDto> returnList = response.body();
+                if (response.isSuccessful()) {
+                    Log.e("반납함리스트", returnList.toString());
+
+                    for (int i = 0; i < returnList.size(); i++) {
+                        getLatLngFromAddress(returnList.get(i).getReturnBoxAddr());
+
+                        MapPoint mapPoint = MapPoint.mapPointWithGeoCoord(latitude, longitude);
+
+                        re_marker = new MapPOIItem();
+                        re_marker.setItemName("반납함");
+                        re_marker.setTag(i);
+                        re_marker.setMapPoint(mapPoint);
+                        re_marker.setMarkerType(MapPOIItem.MarkerType.RedPin);
+                        mapView.addPOIItem(re_marker);
+                        mapView.setMapCenterPoint(mapPoint, true);
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(), "가져오기 실패", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<List<ReturnBoxDto>> call, Throwable t) {
+
+            }
+        });
+
+
+
 
         callRentalUmb = retrofitInterface.getMyRentalUmbrella(myInfo);
 
@@ -440,11 +482,19 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
     @Override
     public void onCalloutBalloonOfPOIItemTouched(MapView mapView, MapPOIItem mapPOIItem, MapPOIItem.CalloutBalloonButtonType calloutBalloonButtonType) {
 
-        Log.e("마커", "전");
 
+        if(mapPOIItem.getItemName().contains("반납함"))
+        {
+            map_layout.setVisibility(View.INVISIBLE);
+            mypage_layout.setVisibility(View.VISIBLE);
+            rentalLayout.setVisibility(View.VISIBLE);
+
+            id.setText(userId);
+            name.setText(userName);
+        }
+        else{
         Call<List<UmbrellaDTO>> call = retrofitInterface.getUmbrellaList(mapPOIItem.getItemName());
 
-        Log.e("마커", "후");
         call.clone().enqueue(new Callback<List<UmbrellaDTO>>() {
             @Override
             public void onResponse(Call<List<UmbrellaDTO>> call, Response<List<UmbrellaDTO>> response) {
@@ -461,6 +511,8 @@ public class MainActivity extends AppCompatActivity implements MapView.CurrentLo
                 Toast.makeText(getApplicationContext(), "통신 오류", Toast.LENGTH_SHORT).show();
             }
         });
+
+        }
     }
 
     @Override

@@ -49,6 +49,7 @@ dependencies {
     implementation("de.hdodenhof:circleimageview:3.1.0")
     implementation("com.github.bootpay:client_android_java:3.5.0")
     implementation("com.google.android.material:material:1.11.0")
+    implementation ("com.squareup.picasso:picasso:2.71828")
     implementation(fileTree(mapOf(
         "dir" to "src\\main\\jniLibs",
         "include" to listOf("*.aar", "*.jar"),

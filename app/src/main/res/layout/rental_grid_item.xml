@@ -17,6 +17,7 @@
             android:layout_height="150dp"
             android:layout_gravity="center"
             android:scaleType="centerCrop"
+            android:id="@+id/rental_umb_img"
             android:src="@drawable/ic_launcher_background">
         </ImageView>
     </androidx.cardview.widget.CardView>

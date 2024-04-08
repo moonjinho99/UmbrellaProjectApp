@@ -2,6 +2,7 @@ package com.example.umbrella.service;
 
 import com.example.umbrella.dto.LockerDto;
 import com.example.umbrella.dto.MemberDto;
+import com.example.umbrella.dto.ReturnBoxDto;
 import com.example.umbrella.dto.UmbrellaDTO;
 
 import java.util.List;
@@ -37,6 +38,11 @@ public interface RetrofitInterface {
     @GET("get_locker")
     Call<List<LockerDto>> getLockerList();
 
+    //지도에서 마커표시(반납함)
+    @GET("get_return")
+    Call<List<ReturnBoxDto>> getReturnBoxList();
+
+
     //클릭한 보관함의 우산리스트 확인
     @POST("get_umbrella")
     Call<List<UmbrellaDTO>> getUmbrellaList(@Body String lockercode);
@@ -61,5 +67,7 @@ public interface RetrofitInterface {
 
     @POST("info_update")
     Call<ResponseBody> infoUpdate(@Body MemberDto updateMember);
+
+
 
 }

@@ -8,9 +8,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.umbrella.dto.UmbrellaDTO;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -50,12 +52,20 @@ public class RentalGridListAdapter extends BaseAdapter {
             convertView = inflater.inflate(R.layout.rental_grid_item,parent,false);
         }
 
+        ImageView umbrella_img = convertView.findViewById(R.id.rental_umb_img);
         TextView name = convertView.findViewById(R.id.locknum);
         TextView price = convertView.findViewById(R.id.price);
         Button returnBtn = convertView.findViewById(R.id.returnBtn);
 
         name.setText(Integer.toString(listitem.getUmbrellacode()));
         price.setText(Integer.toString(listitem.getPrice()));
+
+        String img_name = listitem.getPhoto();
+
+        Picasso.get()
+                .load("http://172.30.1.61:8000/img?img_name="+img_name)
+                .error(R.drawable.ic_launcher_background)
+                .into(umbrella_img);
 
         returnBtn.setOnClickListener(new View.OnClickListener() {
             @Override

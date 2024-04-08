@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.umbrella.service.RetrofitClient;
 import com.example.umbrella.service.RetrofitInterface;
+import com.squareup.picasso.Picasso;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -47,7 +49,11 @@ public class UmbrellaDetail extends AppCompatActivity {
 
     TextView locknum_detail;
 
+    TextView price_detail;
+
     Button rentalButton;
+
+    ImageView umb_img;
 
     int umbrella_code=0;
 
@@ -65,15 +71,28 @@ public class UmbrellaDetail extends AppCompatActivity {
 
         rentalButton = (Button) findViewById(R.id.rentalBtn_detail);
 
+        umb_img = (ImageView) findViewById(R.id.umb_img);
+
+        price_detail = (TextView) findViewById(R.id.price_detail);
+
         Intent intent = getIntent();
         locknum_detail.setText(intent.getStringExtra("locknum"));
-
+        price_detail.setText(intent.getStringExtra("umbrella_price"));
         umbrella_code = intent.getIntExtra("umbrella_code",0);
+
+        String img_name = intent.getStringExtra("umbrella_photo");
+        Log.e("이미지 이름 : ",img_name);
+        Picasso.get()
+                .load("http://172.30.1.61:8000/img?img_name="+img_name)
+                .error(R.drawable.ic_launcher_background)
+                .into(umb_img);
 
         //대여한 우산의 상태와 대여 계정 변경을 위한 초기화
         rentalUmbMap.put("umbrella_code", umbrella_code);
         rentalUmbMap.put("rentalId", LoginActivity.loginId);
         rentalUmbMap.put("rentalStatus", 3);
+
+
 
         // 현재 날짜
         LocalDate currentDate = null;
